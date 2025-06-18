@@ -1,72 +1,30 @@
+# Import libraries
 library(zoo)
-source("functions.R")
 library(ggplot2)
 library(scales)
 library(here)
+source("functions.R")
+
 
 ################### Load data as data frame ################### 
 # load cleaned data from csv file - comma separated
 data <- read.csv("Data/Tessy_data_cleaned.csv", header = TRUE, sep = ",")
-
-#data <- data[!(data$ReportingCountry == "AT" & data$Count == 115), ]
-
-
 cumulative_data_all <- prepare_cumulative_data(data)
 
-################# PLOT MULTIBLE COUNTRIES: cumulative distribution ################# 
-######################### Excluding x = 1 on axis ######################### 
+
+
+################# PLOT MULTIPLE COUNTRIES WITH Q(X): cumulative distribution ################# 
+################################### Excluding x = 1 on axis ################################## 
 my_colors <- c("#00B4D8", "#FF007F", "green3", "#FF6B35", "#6A4C93")
 my_colors <- c("firebrick4","hotpink", "orange2","firebrick1", "gold1")
 my_colors <- c(
-  "#4477AA",  # Deep blue
-  "#EE6677",  # Coral red
-  "#228833",  # Forest green
-  "#CCBB44",  # Mustard yellow
-  "#AA3377"   # Muted purple
+  "#4477AA",
+  "#EE6677",
+  "#228833",
+  "#CCBB44",
+  "#AA3377" 
   )
 
-
-
-p <- ggplot(cumulative_data_all, 
-            aes(x = sorted_outbreak_sizes, y = cumulative_prob, color = ReportingCountry)) +
-  geom_step(size = 1, direction = "vh") +
-  geom_vline(xintercept = 2, linetype = "dotted", color = "gray", size = 0.5) +
-  geom_vline(xintercept = 5, linetype = "dotted", color = "gray", size = 0.5) +
-  scale_y_continuous(
-    trans = "log10", 
-    breaks = 10^(-seq(0, 3, by = 1)), 
-    labels = scales::math_format(.x),
-    minor_breaks = NULL
-  ) +
-  scale_x_continuous(
-    trans = "log10", 
-    breaks = c(1, 2, 5, 10, 100, 1000), 
-    labels = c("1", "2", "5", "10", "100", "1000"),
-    minor_breaks = NULL
-  ) +
-  coord_cartesian(xlim = c(2, 1200), ylim = c(0.001, 1), clip = "off") +  # <-- KEY FIX
-  labs(x = "Outbreak Size", y = "Cumulative Probability", color = "Country") +
-  scale_color_manual(values = my_colors)+
-  theme_minimal() +
-  theme(text = element_text(size = 12, family = "Times New Roman"),
-        axis.text = element_text(size = 10),
-        axis.title.x = element_text(margin = margin(t = 10)),
-        axis.title.y = element_text(margin = margin(r = 10)),
-        legend.position = "right",
-        legend.box = "horizontal",
-        legend.title = element_text(hjust = 0.0),
-        panel.grid.minor.x = element_blank())
-
-print(p)
-p <- p + theme(plot.background = element_rect(fill = "white", color = NA))
-
-save_plot(p, "cum_prop_all_countries")
-
-
-
-
-################################ PLOT WITH Q(X) ################################ 
-################################ Excluding x = 1 ###############################
 
 # Create theoretical adjusted cumulative probability data for outbreak sizes 2:1000
 q_data_censored <- do.call(rbind, lapply(seq(0.1, 0.9, by = 0.1), function(R) {
@@ -132,16 +90,11 @@ p_censored_all <- ggplot(cumulative_data_all,
     linetype = guide_legend(order = 2)
   )
 
+# Print and save plot
 print(p_censored_all)
-
 save_plot(p_censored_all, "cum_prop_all_countries_q(x)", width = 9, height = 5)
 
-# p_censored_all <- p_censored_all + theme(plot.background = element_rect(fill = "white", color = NA))
-# 
-# ggsave(
-#   here("figures", "cum_prop_all_countries_q(x).png"),
-#   plot   = p_censored_all,
-#   width  = 10, height = 6, units = "in", dpi = 300 )
+
 
 
 ####################### ONLY ONE country, x > 1 ####################### 
@@ -197,13 +150,7 @@ ggplot(data, aes(x = AgeGroup, y = Year, fill = OutbreakSize)) +
 
 
 
-
-
-
-
-
 ############################# ABOUT DATA YEARS AND COUNTS ############################# 
-
 
 # Extract year from MinDate
 data$Year <- substr(data$MinDate, 1, 4)

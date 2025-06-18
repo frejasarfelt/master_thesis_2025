@@ -115,7 +115,7 @@ p <- ggplot(age_df, aes(x = AgeGroup, y = PerYearDensityPerc)) +
     panel.grid.minor = element_blank()     # Remove all minor grid lines
   )
 print(p)
-save_plot(p, "Agegroup_prevalence", height = 3)
+# save_plot(p, "Agegroup_prevalence", height = 3)
 
 
 
@@ -151,7 +151,7 @@ p <- ggplot(vaccination_df, aes(x = VaccinationGroup, y = Count)) +
     axis.title.y = element_text(margin = margin(r = 15))
   )
 print(p)
-save_plot(p, "vaccinationgroup_prevalence", height = 2)
+# save_plot(p, "vaccinationgroup_prevalence", height = 2)
 
 
 

@@ -251,28 +251,13 @@ p <- ggplot(group_infected_dt[scenario == scenario_x], aes(x = N, fill = group))
 
 
 
-## Facetted scatterplot of number of infected in each group
+## Facetted scatter plot of number of infected in each group
 group_long <- merge(group_infected_dt[scenario == scenario_x], 
                     group_infected_dt[scenario == scenario_x], 
                     by = "run_id", 
                     allow.cartesian = TRUE)
 group_long <- group_long[group.x != group.y]  # Fjern sammenligning af samme gruppe
 group_long <- group_long[group.x < group.y]     # Beholder kun unikke gruppepar
-
-
-##### SKAL laves om til at køre for scenario_x 
-## Facetted scatterplot of percentage of infected susceptibles in each group
-# input_df$susceptible <- input_df$N * (1 - input_df$coverage)
-# group_long <- merge(group_long, input_df[, c("group", "susceptible")],
-#                     by.x = "group.x", by.y = "group", all.x = TRUE)
-# colnames(group_long)[colnames(group_long) == "susceptible"] <- "susceptible.x"
-# group_long <- merge(group_long, input_df[, c("group", "susceptible")],
-#                     by.x = "group.y", by.y = "group", all.x = TRUE)
-# colnames(group_long)[colnames(group_long) == "susceptible"] <- "susceptible.y"
-# group_long$perc.x <- 100 * group_long$N.x / group_long$susceptible.x
-# group_long$perc.y <- 100 * group_long$N.y / group_long$susceptible.y
-# 
-
 
 
 p <- ggplot(group_long, 
@@ -393,7 +378,7 @@ print(p)
 ### SAVE PLOT OF INFECTED BY ORIGIN
 # save_plot(p, "ABM_infected_by_origin_scn1")
 # save_plot(p, "ABM_infected_by_origin_scn2")
-save_plot(p, "ABM_infected_by_origin_scn3")
+# save_plot(p, "ABM_infected_by_origin_scn3")
 
 
 # Scenario 2: Find the relative fraction of infections that originated from group D and did not end in group D
@@ -409,7 +394,7 @@ with(infected_by_origin, sum(total_infected[outbreak_origin == "B" & group == "A
 
 
 
-# # TEST AT BETA_MATRIX GÅR OP MED R0 (SE DEEPSEEK FOR UDLEDNING OG BEGRUNDELSER FOR AT DET VIRKER)
+# # TEST AT BETA_MATRIX GÅR OP MED R0
 # # Compute the next-generation matrix (NGM)
 # G <- beta_matrix * matrix(gruppe_population, nrow = m, ncol = m, byrow = TRUE) / gamma
 # 

@@ -1,4 +1,4 @@
-
+# Import libraries
 library(ggplot2)
 library(scales)
 source("functions.R")
@@ -88,9 +88,9 @@ p <- ggplot() +
   # Cumulative q(x) for R = 0.1 to 0.9 (theoretical)
   geom_line(aes(x = x, y = y, color = factor(R)), 
             data = q_data, size = 0.5, linetype = "dashed")
-  
-print(p)
 
+# Print and save plot  
+print(p)
 save_plot(p, "q(x)_cumulative")
 
 

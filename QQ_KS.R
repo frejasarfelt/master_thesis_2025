@@ -90,48 +90,9 @@ p <- ggplot(qq_data_all, aes(x = Theoretical, y = Empirical)) +
     panel.grid.minor = element_blank(),
   )
 
+# Print and save plot
 print(p)
-
 save_plot(p, "QQ_plot")
-
-
-
-
-
-
-# # one-sample K–S test
-# # It can be used to test if a sample came from a given reference probability distribution
-# 
-# library(dgof)
-# 
-# R <- 0.9
-# x <- 1
-# 
-# 
-# custom_cdf <- function(x, R) {
-#   sapply(x, function(xi) {
-#     if (xi < 0) return(0)
-#     return(1 - compute_cumulative_logtransform_q(xi + 1, R))
-#   })
-# }
-# 
-# 
-# # give me a list of count values for the country IE where the 1's are removed
-# emp_sample_IE <- data %>%
-#   filter(ReportingCountry == "IE", Count >= 5) %>%
-#   pull(Count)
-# 
-# # ks.test(emp_sample_IE, function(x) custom_cdf(x, R), simulate.p.value = TRUE, B=1000)
-# 
-# 
-# ks.test(emp_sample_IE, y = function(x) custom_cdf(x, R), simulate.p.value = TRUE, B = 1000)
-# 
-# 
-# plot(ecdf(emp_sample_IE), main = "Empirical vs Model CDF", col = "blue", lwd = 2)
-# curve(custom_cdf(x, R), add = TRUE, col = "red", lwd = 2)
-# legend("bottomright", legend = c("Empirical", "Model"), col = c("blue", "red"), lwd = 2)
-# 
-# # Not good with many ties
 
 
 
@@ -155,8 +116,6 @@ chisq_test <- function(data, country_code, R){
   
   # Chi-squared test
   res <- chisq.test(x = as.numeric(obs_counts), p = pmf, rescale.p = TRUE, simulate.p.value = TRUE, B = 10000)
-  
-  # return(res)
   
   return(tibble(
     p_value = res$p.value,

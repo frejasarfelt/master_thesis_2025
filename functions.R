@@ -4,6 +4,15 @@
 ##### Library
 library(hypergeo)
 
+####################### Save plots ####################### 
+save_plot <- function(p, filename, width = 6, height = 4, dpi = 300) {
+  ggsave(paste0("Figures/", filename, ".png"), plot = p, width = width, height = height, dpi = dpi)
+}
+
+
+##########################################################################################
+#################################### SIMULATIONS #########################################
+##########################################################################################
 
 ####################### Simulate outbreaks ####################### 
 simulate_outbreak <- function(R) {
@@ -139,6 +148,7 @@ simulate_run <- function(run_id, input_df) {
               effective_R_total = effective_R_total))
 }
 
+
 ##### Run simulations in parallel #####
 parallel_run_simulations <- function(input_df, N_simulations) {
   cl <- parallel::makeCluster(parallel::detectCores() - 1)
@@ -168,6 +178,7 @@ parallel_run_simulations <- function(input_df, N_simulations) {
   
   return(results)
 }
+
 
 ##### Test overall coverage as function #####
 overall_coverage <- function(input_df) {
@@ -217,6 +228,10 @@ compute_cumulative_logtransform_q <- function(n, R) {
   return(cum_q)
 }
 
+
+
+
+
 ##########################################################################################
 #################################### NON CENSORED DATA ###################################
 ##########################################################################################
@@ -227,6 +242,7 @@ calculate_R <- function(outbreak_sizes, min_outbreak_size = 1) {
   
   return(R_estimate)
 }
+
 
 ####################### Logarithm of Total Likelihood Function ####################### 
 # is the product of the likelihoods for each individual outbreak
@@ -278,6 +294,7 @@ bootstrap_R <- function(outbreak_sizes, n_bootstraps = 1000) {
   return(R_estimates)
 }
 
+
 ####################### Calculate p-values of bootstrap #######################
 calculate_p_value <- function(R_observed, R_bootstrap_estimates, R) {
   # Calculate the proportion of bootstrapped estimates as extreme as or more extreme than the observed estimate
@@ -294,6 +311,8 @@ Fisher_Variance <- function(R_hat,n,m){
   d2_log_likelihood = (-n*(m-1)/(R_hat**2)) + n*(2*m-1)/((R_hat+1)**2)
   1/(-d2_log_likelihood) 
 }
+
+
 
 
 
@@ -339,6 +358,7 @@ estimate_R_censored <- function(data, c) {
   )
   return(result$par)
 }
+
 
 ####################### Fisher Information Method of uncertainty estimation #################### 
 ######### Compute the Hessian (second derivative) at R_hat
@@ -412,10 +432,33 @@ likelihood_ratio_censored <- function(data1, data2, c, alpha = 0.05) {
   return(list(Lambda = Lambda, CriticalValue = critical_value))
 }
 
-####################### Save plots ####################### 
-save_plot <- function(p, filename, width = 6, height = 4, dpi = 300) {
-  ggsave(paste0("Figures/", filename, ".png"), plot = p, width = width, height = height, dpi = dpi)
+
+############################### Bootstrap Test H0: R1 != R2 ############################### 
+# Is the difference in two R estimates larger than the differences when drawn from the pooled data?
+# Define bootstrap test function
+bootstrap_distribution_test <- function(data1, data2, c = 4, n_boot = 1000) {
+  tryCatch({
+    pooled_data <- c(data1, data2)
+    n1 <- length(data1)
+    n2 <- length(data2)
+    
+    R_diff_obs <- abs(estimate_R_censored(data1, c) - estimate_R_censored(data2, c))
+    
+    boot_stats <- replicate(n_boot, {
+      boot1 <- sample(pooled_data, n1, replace = TRUE)
+      boot2 <- sample(pooled_data, n2, replace = TRUE)
+      abs(estimate_R_censored(boot1, c) - estimate_R_censored(boot2, c))
+    })
+    
+    p_value <- mean(boot_stats >= R_diff_obs, na.rm = TRUE)
+    data.frame(Bootstrap_p = p_value, Bootstrap_Reject = p_value < 0.05)
+    
+  }, error = function(e) {
+    data.frame(Bootstrap_p = NA, Bootstrap_Reject = NA)
+  })
 }
+
+
 
 
 
@@ -426,11 +469,9 @@ save_plot <- function(p, filename, width = 6, height = 4, dpi = 300) {
 ################################# DATA HANDELING ##############################
 ###############################################################################
 
-
 ##################### Prepare cumulative data ##################### 
 # from raw data
 ## Removes data with at less than 20 outbreaks
-
 prepare_cumulative_data <- function(data, min_valid_counts = 20, min_outbreak_size = 5) {
   countries <- unique(data$ReportingCountry)
   cumulative_results <- list()
@@ -471,34 +512,4 @@ prepare_cumulative_data <- function(data, min_valid_counts = 20, min_outbreak_si
   }))
   
   return(cumulative_data_all)
-}
-
-
-
-
-
-############################### Bootstrap Test H0: R1 != R2 ############################### 
-# Is the difference in two R estimates larger than the differences when drawn from the pooled data?
-
-# Define bootstrap test function
-bootstrap_distribution_test <- function(data1, data2, c = 4, n_boot = 1000) {
-  tryCatch({
-    pooled_data <- c(data1, data2)
-    n1 <- length(data1)
-    n2 <- length(data2)
-    
-    R_diff_obs <- abs(estimate_R_censored(data1, c) - estimate_R_censored(data2, c))
-    
-    boot_stats <- replicate(n_boot, {
-      boot1 <- sample(pooled_data, n1, replace = TRUE)
-      boot2 <- sample(pooled_data, n2, replace = TRUE)
-      abs(estimate_R_censored(boot1, c) - estimate_R_censored(boot2, c))
-    })
-    
-    p_value <- mean(boot_stats >= R_diff_obs, na.rm = TRUE)
-    data.frame(Bootstrap_p = p_value, Bootstrap_Reject = p_value < 0.05)
-    
-  }, error = function(e) {
-    data.frame(Bootstrap_p = NA, Bootstrap_Reject = NA)
-  })
 }
