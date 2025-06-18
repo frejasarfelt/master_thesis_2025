@@ -1,3 +1,4 @@
+# Import libraries
 source("functions.R")
 library(dplyr)
 library(tidyr)
@@ -100,7 +101,6 @@ formatted_results <- test_results %>%
   )
 
 print(formatted_results)
-# write.csv(formatted_results, "pairwise_test_results.csv", row.names = FALSE)
 
 
 

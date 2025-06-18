@@ -1,3 +1,4 @@
+# Import libraries
 source("functions.R")
 library(dplyr)
 library(tidyr)
@@ -16,7 +17,6 @@ for (ctry in countries) {
     valid_countries[[ctry]] <- outbreak_sizes
   }
 }
-#valid_countries$AT <- valid_countries$AT[valid_countries$AT != 115]
 
 # Initialize results storage
 results <- list()

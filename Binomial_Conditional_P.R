@@ -1,3 +1,4 @@
+# Import libraries
 library(tidyverse)
 library(ggplot2)
 library(patchwork)
@@ -7,7 +8,6 @@ library(dplyr)
 
 
 ######### Data 
-
 age_groups <- c("X0.4y","X5.14y","X15.25y","X26.50y","X50.")
 age_labels <- c(
   "X0.4y"   = "0–4",
@@ -17,7 +17,7 @@ age_labels <- c(
   "X50."    = "50+"
 )
 
-widths     <- c(X0.4y=5, X5.14y=10, X15.25y=11, X26.50y=25, X50.=30)
+widths <- c(X0.4y=5, X5.14y=10, X15.25y=11, X26.50y=25, X50.=30)
 
 data <- read_csv("Data/Tessy_data_cleaned.csv") %>% 
   mutate(across(all_of(age_groups),
@@ -27,7 +27,7 @@ data <- read_csv("Data/Tessy_data_cleaned.csv") %>%
   filter(ReportingCountry %in% c("ES", "PL", "UK", "AT", "IE"))
 
 # Conditional probabilities: Use ALL data (Not depending on N_i)
-cond_data = data  # No filtering
+cond_data = data
 
 # Binomial model: Exclude Count <5 (excact N_i are needed)
 data <- data %>% filter(Count >= 5)
@@ -41,8 +41,8 @@ country_names <- c(
   "IE" = "Ireland"
 )
 
-########## Binomial model
 
+########## Binomial model
 # by country
 country_nest <- data %>%
   group_by(ReportingCountry) %>%
@@ -198,7 +198,6 @@ country_cond <- cond_data %>%
 
 
 ####### Plotting
-
 
 # Common y-axis limits across all plots
 y_limit <- range(country_p$UpperYear, na.rm = TRUE)

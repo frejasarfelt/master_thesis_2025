@@ -1,3 +1,5 @@
+# Import libraries
+library(ggplot2)
 source("functions.R")
 
 # Load and preprocess data
@@ -12,12 +14,9 @@ for (ctry in countries) {
   
   if(sum(outbreak_sizes$Count>=5) >= 20) {
     outbreak_dates[[ctry]] <- outbreak_sizes
-    
   }
 }
 
-
-library(ggplot2)
 
 # Combine all valid countries into one data frame
 plot_data <- do.call(rbind, lapply(names(outbreak_dates), function(ctry) {
@@ -42,12 +41,12 @@ country_names <- c(
 )
 
 p_outbreaks <- ggplot(plot_data, aes(x = MinDate, y = Count)) +
-  geom_point(size = 2, alpha = 0.8, colour = "firebrick3") +    # all points black
+  geom_point(size = 2, alpha = 0.8, colour = "firebrick3") +
   theme_minimal(base_size = 16) +
   theme(
     panel.grid.minor.x    = element_blank(),
     panel.grid.minor.y    = element_blank(),
-    legend.position       = "none"                         # remove legend
+    legend.position       = "none" 
   ) +
   labs(
     x = "Outbreak Start Date",
