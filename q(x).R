@@ -1,18 +1,18 @@
-
-#########################################################################   
-######################## Plot of q(x) for different R ######################## 
-######### q(x): the probability that the final size of the outbreak is x
-
+# Import libraries
 library(ggplot2)
 library(dplyr)
 library(tidyr)
+library(parallel)
 source("functions.R")
 
 
 
+#########################################################################   
+######################## Plot of q(x) for different R ###################
+######### q(x): the probability that the final size of the outbreak is x
+
 # Define R values
 R_values <- seq(0.1, 0.9, by = 0.1) # R from 0.1 to 0.9
-
 
 # Compute q(x) for each R
 q_data <- expand.grid(x = 1:1000, R = R_values) %>%
@@ -20,8 +20,6 @@ q_data <- expand.grid(x = 1:1000, R = R_values) %>%
   mutate(qx = ifelse(is.nan(qx), 0, qx)) %>%
   mutate(qx = ifelse(is.infinite(qx), 0, qx)) %>%
   filter(qx > 0)
-
-
 
 # Generate simulation data
 simulation_data <- do.call(rbind, lapply(R_values, function(R) {
@@ -33,8 +31,6 @@ simulation_data <- do.call(rbind, lapply(R_values, function(R) {
 simulated_probs <- simulation_data %>%
   group_by(R, outbreak_size) %>%
   summarise(prob = n()/100000, .groups = "drop")
-
-
 
 # Convert R to factor for color consistency
 q_data$R <- factor(q_data$R)
@@ -52,24 +48,18 @@ p <- ggplot() +
   geom_point(data = simulated_probs, aes(x = outbreak_size, y = prob, color = R), size = 1.5) +
   scale_y_continuous(trans = "log10",
                      breaks = 10^(-seq(0, 3, by = 1)),
-                     minor_breaks = NULL,             
-                     # labels = scales::trans_format("log10", scales::math_format(10^.x))
-                     labels = scales::math_format(.x)
-                     ) +
-  #xlim(1, 100) +
+                     minor_breaks = NULL,
+                     labels = scales::math_format(.x)) +
   scale_x_continuous(
     limits     = c(0, 100),
-    expand     = c(0, 0),                # no padding below 1
-    breaks     = c(1,seq(20, 100, by = 20)),   # only these ticks
-    minor_breaks = NULL                  # no minor x–gridlines
-  ) +
+    expand     = c(0, 0),
+    breaks     = c(1,seq(20, 100, by = 20)),
+    minor_breaks = NULL) +
   coord_cartesian(ylim = c(0.0001, 1)) +
   labs(x = "Outbreak Size", y = "Probability", color = "R Value") +
   theme_minimal() +
   theme(
-    # drop vertical major grid lines entirely
     panel.grid.major.x   = element_blank(),
-    # keep only horizontal majors (already there), no minors anywhere
     panel.grid.minor     = element_blank(),
     text = element_text(size = 12),
     axis.text = element_text(size = 10),
@@ -78,11 +68,8 @@ p <- ggplot() +
     legend.title = element_text(size = 12, hjust = 0.5)
   ) +
   scale_color_manual(values = red_scale, name = expression(R[e]))
-  # scale_color_viridis_d(option = "inferno")
 
 print(p)
-
-
 save_plot(p, "q(x)_simulations")
 
 
@@ -92,15 +79,8 @@ save_plot(p, "q(x)_simulations")
 
 
 
-
+#########################################################################################
 ########################### Uncertaincy depending on sample size ########################
-
-
-library(parallel)
-library(ggplot2)
-library(tidyr)
-library(dplyr)
-source("functions.R")
 
 # Parameters
 true_R       <- 0.5
@@ -182,7 +162,6 @@ se_df <- results %>%
 p1 <- ggplot(se_df, aes(x = n, y = SE, color = method)) +
   geom_line(linewidth = 1.5) +
   geom_point(size = 3) +
-  #  geom_abline(intercept = log10(0.6), slope = -0.5, linetype = "dashed", color = "#1f77b4") +
   scale_x_log10() +
   scale_y_log10() +
   scale_y_log10(limits = c(0.02, 0.3)) +
@@ -193,12 +172,10 @@ p1 <- ggplot(se_df, aes(x = n, y = SE, color = method)) +
   ) +
   scale_color_manual(
     values = c(
-      #"empirical_SE" = "black",
       "avg_fisher_SE" = "#1f77b4",
       "avg_boot_SE" = "#ff7f0e"
     ),
     labels = c(
-      #"empirical_SE" = "Empirical",
       "avg_fisher_SE" = "Fisher",
       "avg_boot_SE" = "Bootstrap"
     )
@@ -215,6 +192,8 @@ p1 <- ggplot(se_df, aes(x = n, y = SE, color = method)) +
 
 print(p1)
 save_plot(p1, "SE_vs_R",width = 5, height = 4)
+
+
 
 ########### SLOPE OF FISHER ########### 
 
@@ -242,7 +221,6 @@ p2 <- ggplot(cov_df, aes(x = n, y = coverage, color = method)) +
   geom_line(linewidth = 1.5) + 
   geom_point(size = 3) +
   labs(
-    #title = "Coverage of 95% CIs vs Sample Size",
     x = "Sample Size (n)", 
     y = "Coverage Probability",
     color = NULL
@@ -266,12 +244,3 @@ p2 <- ggplot(cov_df, aes(x = n, y = coverage, color = method)) +
 
 print(p2)
 save_plot(p2, "Coverage_CI_vs_n",width = 7, height = 4)
-
-
-
-
-
-
-
-
-
