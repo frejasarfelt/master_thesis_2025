@@ -20,9 +20,11 @@ Simulations of agent based models (ABMs).
 
 ## Binomial_Conditional_P.R
 
-For age-specific data analysis. 
+For age-specific data analysis.
 
 ![](Figures/binom_p.png){width="431"}
+
+![](Figures/cond_prop.png){width="431"}
 
 ## Censored_MLE_R.R
 
@@ -50,8 +52,7 @@ All plots assumes x = 1 is not in the data.
 
 ## q(x).R
 
-The function q(x) from Jansen & Stollenwerk is implemented. It's the probability of an outbreak size being exactly of size x.
-Further, uncertainty associated with sample size its included.
+The function q(x) from Jansen & Stollenwerk is implemented. It's the probability of an outbreak size being exactly of size x. Further, uncertainty associated with sample size its included.
 
 ![](Figures/q(x)_simulations.png){width="430"}
 
